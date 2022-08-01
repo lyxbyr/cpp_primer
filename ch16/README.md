@@ -3,7 +3,7 @@
 
 ## 16.2 编写并测试自己的compare函数
 
-```
+```cpp
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -24,7 +24,7 @@ int main() {
 }
 ```
 ## 16.3 对两个Sales_data对象调用你的compare函数，观察编译器在实例话过程中如果处理错误
-```
+```cpp
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -50,7 +50,7 @@ int main() {
 ## 16.4 编写行为类似标准库find算法的模板，函数需要两个模板类的参数，一个表示函数的迭代器参数，另一个表示值的类型。使用你的函数在一个vector<int>和list<string>中查找给定值
 - use c++14 compile
 
-```
+```cpp
 #include <iostream>
 #include <list>
 #include <vector>
@@ -80,7 +80,7 @@ int main() {
 
 ## 16.5 编写一个print函数模板，它能接受一个数组的引用，能处理任意大小、任意元素类型的数组
  
-```
+```cpp
 #include <iostream>
 #include <string>
 #include <vector>
@@ -109,7 +109,7 @@ int main() {
 
 ## 16.6 你认为接受一个数组实参的标准库函数begin和end是如何工作的？ 定义你自己版本的begin和end
 
-```
+```cpp
 #include <iostream>
 #include <string>
 #include <vector>
@@ -133,7 +133,7 @@ int main() {
 
 ## 16.7 编写一个constexpr模板，返回给定数组的大小
  
-```
+```cpp
 #include <iostream>
 #include <string>
 
@@ -165,7 +165,7 @@ int main() {
 ## 16.10 当一个类模板被实例化时，会发生什么？
 - 一个类模板的每个实例都形成一个独立的类
 ## 16.11 下面List的定义是错误的，应该如何修正它
-```
+```cpp
 template<typename elemType> 
 class ListItem;
 template<typename elemType> 
@@ -181,8 +181,7 @@ class List {
 };
 ```
 - 模板需要模板参数，修改如下：
-```
-
+```cpp
 template <typename elemType>
 class ListItem;
 template <typename elemType>
@@ -201,7 +200,7 @@ class List {
 ## 16.12 编写你自己版本的Blob和BlobPtr模板，包含书中未定义的多个const成员
 - Blob class
 
-```
+```cpp
 template <typename T>
 class Blob {
  public :
@@ -274,7 +273,7 @@ const T& Blob<T>::operator[](size_type i) const {
 }
 ```
 - BlobPtr class
-```
+```cpp
 template <typename T>
 bool operator==(const BlobPtr<T> &lhs, const BlobPtr<T> &rhs);
 bool operator < (const BlobPtr<T> & lhs, const BlobPtr<T> &rhs);
@@ -354,13 +353,65 @@ bool operator<(const BlobPtr<T> &lhs, const BlobPtr<T> & rhs) {
 ```
 
 ## 16.13 解释你为BlobPtr的相等和关系运算符选择哪种类型的友好关系？
+- 这里需要与类型的一一对应，所以就选择一对一友好关系
 
 
+## 16.14 
+> 编写Screen类模板，用非类型参数定义Screeen的高和宽
 
-## 16.14 编写Screen类模板，用非类型参数定义Screeen的高和宽
+[Screen](screen.h)
 
+```cpp
+#ifndef SCREEN_H
+#define SCREEN_H
 
-## 16.15 为你的Screen模板实现输入和输出运算符，Screen类需要哪些友元(如果需要的话)
-来令输入和输出运算符正确工作？ 解释每个友元声明(如果有的话)为什么是必要的
+#include <iostream>
+#include <string>
 
-## 16.16 将StrVec类重写为模板，命名为Vec
+template <unsigned H, unsigned W>
+class Screen {
+ public:
+  typedef std::string::size_type pos;
+  Screen() = default;
+  Screen(char c) : contents(H * W, c) {}
+
+  char get() const { return contents[cursor]; }
+  Screen& move(pos r, pose c);
+
+  friend std::ostream& operator<<(std::ostream& os, const Screen<H, W>& c) {
+    unsigned int i, j;
+    for (int i = 0; i < c.height; i++) {
+      os << c.contents.substr(0, W) << std::endl;
+    }
+    return os;
+  }
+
+  friend std::istream& operator>>(std::istream& is, Screen& c) {
+    char a;
+    is >> a;
+    std::string temp(H * W, a);
+    c.contents = temp;
+    return is;
+  }
+
+ private:
+  pos cursor = 0;
+  pos height = H, width = w;
+  std::string contents;
+};
+
+template <unsigned H, unsigned W>
+inline Screen<H, W>& Screen<H, W>::move(pos r, pos, c) {
+  pos row = r * width;
+  cursor = row + c;
+  return *this;
+}
+
+#endif  // SCREEN_H
+```
+## 16.15 
+> 为你的Screen模板实现输入和输出运算符，Screen类需要哪些友元(如果需要的话)来令输入和输出运算符正确工作？ 解释每个友元声明(如果有的话)为什么是必要的。
+- 类的operator<< 和 operator>>应该是类的友元
+
+## 16.16 
+> 将StrVec类重写为模板，命名为Vec
